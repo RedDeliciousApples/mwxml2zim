@@ -11,11 +11,13 @@ def page_handler(model, title, text) -> None:
     if model != "wikitext" or title.startswith("Template:"):
         return None
     tree = parser.parse(text, pre_expand=True)
+    print("breakpoint")
 
 
 
 def process_dump(path):
-    parser.process(path, page_handler)
+    iterator = parser.process(path, page_handler)
+    print("breakpoint")
 
 
 def print_hi(name):
