@@ -1,5 +1,3 @@
-from platform import node
-
 from wikitextprocessor import Wtp, WikiNode, NodeKind
 
 # Press Shift+F10 to execute it or replace it with your code.
@@ -14,10 +12,9 @@ def page_handler(model, title, text) -> None:
     print("breakpoint")
 
 
-
 def process_dump(path):
     iterator = parser.process(path, page_handler)
-    print("breakpoint")
+    print("breakpoint2")
 
 
 def print_hi(name):
