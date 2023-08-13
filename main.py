@@ -13,7 +13,7 @@ def page_handler(model, title, text) -> None:
 
 
 def process_dump(path):
-    iterator = parser.process(path, page_handler)
+    iterator = list(parser.process(path, page_handler))
     print("breakpoint2")
 
 
