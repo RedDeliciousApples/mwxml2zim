@@ -11,19 +11,18 @@ def page_handler(model, title, text) -> None:
     if model != "wikitext" or title.startswith("Template:"):
         return None
     tree = parser.parse(text, pre_expand=True)
-    value = parser.node_to_wikitext(node)
-    print(value)
 
 
-def process_dump(file):
-    parser.process("enwiktionary-20201201-pages-articles.xml.bz2", page_handler)
+
+def process_dump(path):
+    parser.process(path, page_handler)
 
 
 def print_hi(name):
     # Use a breakpoint in the code line below to debug your script.
     print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
-    file = open("Wikipedia-20230812015758.xml")
-    process_dump(file)
+    filePath = "Wikipedia-20230812015758.xml"
+    process_dump(filePath)
 
 
 # Press the green button in the gutter to run the script.
