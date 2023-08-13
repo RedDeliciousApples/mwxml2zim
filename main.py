@@ -13,6 +13,7 @@ def page_handler(model, title, text) -> None:
 
 
 def process_dump(path):
+    #TODO /tmp doesnt exist on windows, use different folder
     iterator = list(parser.process(path, page_handler))
     print("breakpoint2")
 
