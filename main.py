@@ -1,14 +1,14 @@
-from wikitextprocessor import Wtp, WikiNode, NodeKind
+from wikitextprocessor import Wtp, WikiNode, NodeKind, Page
 
 # Press Shift+F10 to execute it or replace it with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 parser = Wtp()
 
 
-def page_handler(model, title, text) -> None:
-    if model != "wikitext" or title.startswith("Template:"):
+def page_handler(page : Page) -> None:
+    if page.model != "wikitext" or page.title.startswith("Template:"):
         return None
-    tree = parser.parse(text, pre_expand=True)
+    tree = parser.parse(page.text, pre_expand=True)
     print("breakpoint")
 
 
