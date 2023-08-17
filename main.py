@@ -16,7 +16,7 @@ def page_handler(page: Page) -> [1, 2, 3]:
     #    tree = parser.parse(page.text, pre_expand=True)
     print("breakpoint page processed: " + page.title)
     node = parser.parse(page.body)
-    #TODO big improvements needed for node_to_html
+    #TODO big improvements needed for node_to_html, maybe use mwparserfromhell?
     filewriter.write("my_file-{}.html".format(random.randint(1,100)) , parser.node_to_html(node))
     print("page text: " + str(node))
 
