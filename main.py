@@ -7,17 +7,15 @@ parser = Wtp()
 
 def page_handler(page: Page) -> [1,2,3]:
     if page.model != "wikitext" or page.title.startswith("Template:"):
-        print(page.title)
+        print(page.title + " ignored")
         return ["fail"]
     #    tree = parser.parse(page.text, pre_expand=True)
-    if page.title.startswith("A"):
-        print(page.title)
-    print("breakpoint page processed")
+    print("breakpoint page processed: " + page.title)
 
 
 def process_dump(path):
     # TODO /tmp doesnt exist on windows, use different folder
-    namespaces = {100, }
+    namespaces = {0, }
     print(list(parser.process(path, page_handler, namespaces)))
     print("breakpoint2")
 
@@ -25,7 +23,7 @@ def process_dump(path):
 def print_hi(name):
     # Use a breakpoint in the code line below to debug your script.
     print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
-    filePath = "Wikipedia-20230812015758.xml"
+    filePath = "appletrainbox.xml"
     process_dump(filePath)
 
 
