@@ -14,7 +14,6 @@ def page_handler(page: Page) -> [1,2,3]:
 
 
 def process_dump(path):
-    # TODO /tmp doesnt exist on windows, use different folder
     namespaces = {0, }
     print(list(parser.process(path, page_handler, namespaces)))
     print("breakpoint2")
