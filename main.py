@@ -5,16 +5,20 @@ from wikitextprocessor import Wtp, WikiNode, NodeKind, Page
 parser = Wtp()
 
 
-def page_handler(page : Page) -> None:
+def page_handler(page: Page) -> [1,2,3]:
     if page.model != "wikitext" or page.title.startswith("Template:"):
-        return None
-    tree = parser.parse(page.text, pre_expand=True)
-    print("breakpoint")
+        print(page.title)
+        return ["fail"]
+    #    tree = parser.parse(page.text, pre_expand=True)
+    if page.title.startswith("A"):
+        print(page.title)
+    print("breakpoint page processed")
 
 
 def process_dump(path):
-    #TODO /tmp doesnt exist on windows, use different folder
-    iterator = list(parser.process(path, page_handler))
+    # TODO /tmp doesnt exist on windows, use different folder
+    namespaces = {100, }
+    print(list(parser.process(path, page_handler, namespaces)))
     print("breakpoint2")
 
 
