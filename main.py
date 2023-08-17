@@ -1,4 +1,8 @@
+import random
+
 from wikitextprocessor import Wtp, WikiNode, NodeKind, Page
+
+import filewriter
 
 # Press Shift+F10 to execute it or replace it with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
@@ -12,6 +16,7 @@ def page_handler(page: Page) -> [1, 2, 3]:
     #    tree = parser.parse(page.text, pre_expand=True)
     print("breakpoint page processed: " + page.title)
     node = parser.parse(page.body)
+    filewriter.write("my_file-{}.html".format(random.randint(1,100)) , parser.node_to_html(node))
     print("page text: " + str(node))
 
 
