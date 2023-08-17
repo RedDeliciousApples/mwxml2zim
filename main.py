@@ -8,7 +8,7 @@ parser = Wtp()
 def page_handler(page: Page) -> [1, 2, 3]:
     if page.model != "wikitext" or page.title.startswith("Template:"):
         print(page.title + " ignored")
-        return ["fail"]
+        return ["fail on page " + page.title]
     #    tree = parser.parse(page.text, pre_expand=True)
     print("breakpoint page processed: " + page.title)
     node = parser.parse(page.body)
