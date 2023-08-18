@@ -24,6 +24,7 @@ def page_handler(page: Page) -> [1, 2, 3]:
 def process_dump(path):
     namespaces = {0, 10}
     search_tree = list(parser.process(path, page_handler, namespaces))
+    # we need all pages in Module: namespace, figuring out how to get these...
     #for e in search_tree:
        # print("iterated: " + str(len(e)))
         #print("\n\nhtml:\n\n" + parser.node_to_html(e))
