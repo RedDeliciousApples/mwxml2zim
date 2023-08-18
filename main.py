@@ -35,9 +35,15 @@ def process_dump(path):
 def print_hi(name):
     # Use a breakpoint in the code line below to debug your script.
     print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+    modulePath = "Wikipedia-popular-modules.xml"
     filePath = "appletrainboxtemplates.xml"
+    load_modules(modulePath)i
     process_dump(filePath)
 
+def load_modules(path):
+    namespaces = {828}
+    print("Beegin module load...\n")
+    list(parser.process(path, page_handler, namespaces))
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
