@@ -9,6 +9,14 @@ import re
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 parser = Wtp()
 
+def removeTemplate(input_string: str) -> str:
+    # Define a regular expression pattern to match text between curly braces
+    pattern = r'\{[^}]*\}'
+
+    # Use re.sub() to replace the matched pattern with an empty string
+    result = re.sub(pattern, '', input_string)
+
+    return result
 
 def page_handler(page: Page) -> [1, 2, 3]:
     if page.model != "wikitext" or page.title.startswith("Template:"):
@@ -53,13 +61,6 @@ if __name__ == '__main__':
     print_hi('PyCharm')
 
 
-def removeTemplate(input_string: str) -> str:
-    # Define a regular expression pattern to match text between curly braces
-    pattern = r'\{{.*?\}}'
 
-    # Use re.sub() to replace the matched pattern with an empty string
-    result = re.sub(pattern, '', input_string)
-
-    return result
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
