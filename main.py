@@ -37,7 +37,7 @@ def print_hi(name):
     print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
     modulePath = "Wikipedia-popular-modules.xml"
     filePath = "appletrainboxtemplates.xml"
-    load_modules(modulePath)i
+    load_modules(modulePath)
     process_dump(filePath)
 
 def load_modules(path):
