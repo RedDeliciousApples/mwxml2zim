@@ -4,6 +4,7 @@ from wikitextprocessor import Wtp, WikiNode, NodeKind, Page
 
 import filewriter
 import re
+import wikitext_asymptote as wa
 
 # Press Shift+F10 to execute it or replace it with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
@@ -18,15 +19,27 @@ def removeTemplate(input_string: str) -> str:
 
     return result
 
+
+def remove_closing_curly_braces(input_string):
+    # Define a regular expression pattern to match closing curly braces
+    pattern = r'\}'
+
+    # Use re.sub() to replace the matched pattern with an empty string
+    result = re.sub(pattern, '', input_string)
+
+    return result
+
 def page_handler(page: Page) -> [1, 2, 3]:
     if page.model != "wikitext" or page.title.startswith("Template:"):
         print(page.title + " ignored")
         return ["fail on page " + page.title]
     #    tree = parser.parse(page.text, pre_expand=True)
     print("breakpoint page processed: " + page.title)
-    text = removeTemplate(page.body)
+    ftext = removeTemplate(page.body)
+    text = remove_closing_curly_braces(ftext)
+    parsed_page = wa.parse_page(text)
     # TODO big improvements needed for node_to_html, maybe use mwparserfromhell?
-    filewriter.write("my_file-{}.html".format(page.title), text)
+    filewriter.write("my_file-{}.html".format(page.title), parsed_page.get("html"))
     print("page text: " + text)
 
 
