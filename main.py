@@ -15,14 +15,14 @@ def page_handler(page: Page) -> [1, 2, 3]:
         return ["fail on page " + page.title]
     #    tree = parser.parse(page.text, pre_expand=True)
     print("breakpoint page processed: " + page.title)
-    node = parser.parse(page.body)
+    node = parser.parse(str(page.body), True, True)
     #TODO big improvements needed for node_to_html, maybe use mwparserfromhell?
-    filewriter.write("my_file-{}.html".format(random.randint(1,100)) , parser.node_to_html(node))
+    filewriter.write("my_file-{}.html".format(page.title) , parser.node_to_html(node))
     print("page text: " + str(node))
 
 
 def process_dump(path):
-    namespaces = {0, }
+    namespaces = {0, 10}
     search_tree = list(parser.process(path, page_handler, namespaces))
     #for e in search_tree:
        # print("iterated: " + str(len(e)))
@@ -34,7 +34,7 @@ def process_dump(path):
 def print_hi(name):
     # Use a breakpoint in the code line below to debug your script.
     print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
-    filePath = "appletrainbox.xml"
+    filePath = "appletrainboxtemplates.xml"
     process_dump(filePath)
 
 
