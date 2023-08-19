@@ -10,6 +10,7 @@ import wikitext_asymptote as wa
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 parser = Wtp()
 
+
 def removeTemplate(input_string: str) -> str:
     # Define a regular expression pattern to match text between curly braces
     pattern = r'\{[^}]*\}'
@@ -29,18 +30,24 @@ def remove_closing_curly_braces(input_string):
 
     return result
 
+
 def page_handler(page: Page) -> [1, 2, 3]:
     if page.model != "wikitext" or page.title.startswith("Template:"):
         print(page.title + " ignored")
         return ["fail on page " + page.title]
     #    tree = parser.parse(page.text, pre_expand=True)
     print("breakpoint page processed: " + page.title)
+    parse_tree = parser.parse(page.body)
+    print(parse_tree.children[24])
+    #for e in parse_tree.children:
+    #    print(e)
+
     ftext = removeTemplate(page.body)
     text = remove_closing_curly_braces(ftext)
     parsed_page = wa.parse_page(text)
     # TODO big improvements needed for node_to_html, maybe use mwparserfromhell?
-    filewriter.write("my_file-{}.html".format(page.title), parsed_page.get("html"))
-    print("page text: " + text)
+    #filewriter.write("my_file-{}.html".format(page.title), parsed_page.get("html"))
+    #print("page text: " + text)
 
 
 def process_dump(path):
@@ -72,8 +79,5 @@ def load_modules(path):
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     print_hi('PyCharm')
-
-
-
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
