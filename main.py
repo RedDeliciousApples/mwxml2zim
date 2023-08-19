@@ -1,11 +1,6 @@
-import random
-
 from wikitextprocessor import Wtp, WikiNode, NodeKind, Page
 
-import filewriter
 import re
-import wikitext_asymptote as wa
-import pyparsing
 import html
 
 # Press Shift+F10 to execute it or replace it with your code.
@@ -43,6 +38,8 @@ def remove_closing_curly_braces(input_string):
 def tohtml(tree):
     for child in tree.children:
         print(child.title())
+        if NodeKind.LEVEL2:
+            html.level2(child.args)
 
 
 
@@ -65,7 +62,6 @@ def page_handler(page: Page) -> [1, 2, 3]:
 
     ftext = removeTemplate(page.body)
     text = remove_closing_curly_braces(ftext)
-    parsed_page = wa.parse_page(text)
     # TODO big improvements needed for node_to_html, maybe use mwparserfromhell?
     # filewriter.write("my_file-{}.html".format(page.title), parsed_page.get("html"))
     # print("page text: " + text)
