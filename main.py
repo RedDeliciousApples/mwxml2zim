@@ -37,6 +37,7 @@ def page_handler(page: Page) -> [1, 2, 3]:
         return ["fail on page " + page.title]
     #    tree = parser.parse(page.text, pre_expand=True)
     print("breakpoint page processed: " + page.title)
+    #parse_tree.children returns alist of children, useful for iteration
     parse_tree = parser.parse(page.body)
     print(parse_tree.children[24])
     #for e in parse_tree.children:
