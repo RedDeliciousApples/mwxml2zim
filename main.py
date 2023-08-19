@@ -5,6 +5,8 @@ from wikitextprocessor import Wtp, WikiNode, NodeKind, Page
 import filewriter
 import re
 import wikitext_asymptote as wa
+import pyparsing
+import html
 
 # Press Shift+F10 to execute it or replace it with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
@@ -30,6 +32,20 @@ def remove_closing_curly_braces(input_string):
 
     return result
 
+#switch_dict = {
+#    NodeKind.LEVEL2: html.level2(),
+#    NodeKind.LEVEL3: action_for_case2,
+#    NodeKind.LEVEL4: action_for_case3,
+#}
+#def switch_case(case):
+#    action_function = switch_dict.get(case, lambda: "Default action")
+#    return action_function()
+def tohtml(tree):
+    for child in tree.children:
+        print(child.title())
+
+
+
 
 def page_handler(page: Page) -> [1, 2, 3]:
     if page.model != "wikitext" or page.title.startswith("Template:"):
@@ -39,10 +55,11 @@ def page_handler(page: Page) -> [1, 2, 3]:
     print("breakpoint page processed: " + page.title)
     # parse_tree.children returns alist of children, useful for iteration
     parse_tree = parser.parse(page.body)
+    tohtml(parse_tree)
     for i in parse_tree.children:
         nodeKind = i.kind
         # ??? python has no swicth stements ???
-    print(parse_tree.children[24])
+    #print(parse_tree.children[24])
     # for e in parse_tree.children:
     #    print(e)
 
@@ -52,6 +69,7 @@ def page_handler(page: Page) -> [1, 2, 3]:
     # TODO big improvements needed for node_to_html, maybe use mwparserfromhell?
     # filewriter.write("my_file-{}.html".format(page.title), parsed_page.get("html"))
     # print("page text: " + text)
+
 
 
 def process_dump(path):
