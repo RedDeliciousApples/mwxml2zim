@@ -37,18 +37,18 @@ def page_handler(page: Page) -> [1, 2, 3]:
         return ["fail on page " + page.title]
     #    tree = parser.parse(page.text, pre_expand=True)
     print("breakpoint page processed: " + page.title)
-    #parse_tree.children returns alist of children, useful for iteration
+    # parse_tree.children returns alist of children, useful for iteration
     parse_tree = parser.parse(page.body)
     print(parse_tree.children[24])
-    #for e in parse_tree.children:
+    # for e in parse_tree.children:
     #    print(e)
 
     ftext = removeTemplate(page.body)
     text = remove_closing_curly_braces(ftext)
     parsed_page = wa.parse_page(text)
     # TODO big improvements needed for node_to_html, maybe use mwparserfromhell?
-    #filewriter.write("my_file-{}.html".format(page.title), parsed_page.get("html"))
-    #print("page text: " + text)
+    # filewriter.write("my_file-{}.html".format(page.title), parsed_page.get("html"))
+    # print("page text: " + text)
 
 
 def process_dump(path):
