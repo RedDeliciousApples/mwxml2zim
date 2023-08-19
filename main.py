@@ -56,8 +56,8 @@ def page_handler(page: Page) -> [1, 2, 3]:
     # parse_tree.children returns alist of children, useful for iteration
     parse_tree = parser.parse(page.body)
     tohtml(parse_tree)
-    for i in parse_tree.children:
-        nodeKind = i.kind
+    #for i in parse_tree.children:
+    #    nodeKind = i.kind
         # ??? python has no swicth stements ???
     #print(parse_tree.children[24])
     # for e in parse_tree.children:
