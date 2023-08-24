@@ -26,3 +26,15 @@ def level5(text):
 def level6(text):
     content = "<h6> " + text + "</h6> <br />"
     filewriter.write(content, list)
+
+def italic(text):
+    content = "<i> " + text + "</i>"
+    filewriter.write(content, list)
+
+def bold(text):
+    content = "<b>" + text + "</b>"
+    filewriter.write(content, list)
+
+def hline():
+    content = "<hr>"
+    filewriter.write(content, list)

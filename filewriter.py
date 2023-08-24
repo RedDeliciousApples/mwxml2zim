@@ -3,7 +3,7 @@ def write(content, list):
 def init() -> list:
     #starts a list with open html template
     htmlList = []
-    htmlList.insert("""
+    htmlList.append("""
         <!DOCTYPE html>
         <html>
         <head>

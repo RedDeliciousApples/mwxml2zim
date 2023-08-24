@@ -37,9 +37,8 @@ def remove_closing_curly_braces(input_string):
 #    return action_function()
 def tohtml(tree):
     for child in tree.children:
-        print(child.title())
-        if NodeKind.LEVEL2:
-            html.level2(child.args)
+        print(child)
+
 
 
 
