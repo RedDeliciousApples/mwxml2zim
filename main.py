@@ -41,7 +41,7 @@ def remove_closing_curly_braces(input_string):
 #    return action_function()
 def tohtml(tree):
     for child in tree.children:
-        if (child.kind == NodeKind.LIST):
+        if child.kind == NodeKind.LIST:
             htmlHandler.handlelist(child)
 
         print(child)

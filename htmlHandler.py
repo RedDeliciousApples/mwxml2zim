@@ -1,4 +1,4 @@
-from wikitextprocessor import WikiNode
+from wikitextprocessor import WikiNode, NodeKind
 
 import filewriter
 
@@ -42,4 +42,27 @@ def hline():
     filewriter.write(content, list)
 
 def handlelist(listNode: WikiNode):
+    level = len(listNode.sarg)
+    #unordered list
+    if (listNode.sarg.__contains__("*")):
+        filewriter.write("<ul> ", list)
+        for item in listNode.children:
+            #handle multilevel lists
+            if item.kind == NodeKind.LIST_ITEM:
+                handlelist(item)
+            content = "<li> " + item.sarg + "</li>"
+            filewriter.write(content, list)
+        filewriter.write("</ul>", list)
+
+    #ordered list
+    elif (listNode.sarg.__contains__("#")):
+        filewriter.write("<ol> ", list)
+        for item in listNode.children:
+            # handle multilevel lists
+            if item.kind == NodeKind.LIST_ITEM:
+                handlelist(item)
+            content = "<li> " + item.sarg + "</li>"
+            filewriter.write(content, list)
+        filewriter.write("</ol>", list)
+
     print("placeholder")
