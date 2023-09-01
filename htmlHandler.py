@@ -1,3 +1,5 @@
+from wikitextprocessor import WikiNode
+
 import filewriter
 
 list = filewriter.init()
@@ -38,3 +40,6 @@ def bold(text):
 def hline():
     content = "<hr>"
     filewriter.write(content, list)
+
+def handlelist(listNode: WikiNode):
+    print("placeholder")
