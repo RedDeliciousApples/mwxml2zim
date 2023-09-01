@@ -3,5 +3,6 @@
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/wikitextprocessor" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/wikitextprocessor/wikitextprocessor/lua/mediawiki-extensions-Scribunto" vcs="Git" />
   </component>
 </project>

@@ -1,11 +1,14 @@
-from wikitextprocessor import Wtp, WikiNode, NodeKind, Page
+from functools import partial
+from typing import Any
 
+from wikitextprocessor import Wtp, WikiNode, NodeKind, Page
+from wikitextprocessor.dumpparser import process_dump
 import re
-import html
+import htmlHandler
 
 # Press Shift+F10 to execute it or replace it with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-parser = Wtp()
+wtp = Wtp()
 
 
 def removeTemplate(input_string: str) -> str:
@@ -27,12 +30,13 @@ def remove_closing_curly_braces(input_string):
 
     return result
 
-#switch_dict = {
+
+# switch_dict = {
 #    NodeKind.LEVEL2: html.level2(),
 #    NodeKind.LEVEL3: action_for_case2,
 #    NodeKind.LEVEL4: action_for_case3,
-#}
-#def switch_case(case):
+# }
+# def switch_case(case):
 #    action_function = switch_dict.get(case, lambda: "Default action")
 #    return action_function()
 def tohtml(tree):
@@ -40,22 +44,20 @@ def tohtml(tree):
         print(child)
 
 
-
-
-
-def page_handler(page: Page) -> [1, 2, 3]:
+def page_handler(page: Page, wtp: Wtp | None = None) -> Any:
     if page.model != "wikitext" or page.title.startswith("Template:"):
         print(page.title + " ignored")
         return ["fail on page " + page.title]
     #    tree = parser.parse(page.text, pre_expand=True)
     print("breakpoint page processed: " + page.title)
     # parse_tree.children returns alist of children, useful for iteration
-    parse_tree = parser.parse(page.body)
+    wtp.start_page(page.title)
+    parse_tree = wtp.parse(page.body)
     tohtml(parse_tree)
-    #for i in parse_tree.children:
+    # for i in parse_tree.children:
     #    nodeKind = i.kind
-        # ??? python has no swicth stements ???
-    #print(parse_tree.children[24])
+    # ??? python has no swicth stements ???
+    # print(parse_tree.children[24])
     # for e in parse_tree.children:
     #    print(e)
 
@@ -66,10 +68,13 @@ def page_handler(page: Page) -> [1, 2, 3]:
     # print("page text: " + text)
 
 
-
-def process_dump(path):
+def process_dump_internal(path):
     namespaces = {0, 10}
-    search_tree = list(parser.process(path, page_handler, namespaces))
+    process_dump(wtp, path, namespaces)
+    for _ in map(
+            partial(page_handler, wtp=wtp), wtp.get_all_pages([0], False)
+    ):
+        pass
     # we need all pages in Module: namespace, figuring out how to get these...
     # for e in search_tree:
     # print("iterated: " + str(len(e)))
@@ -82,15 +87,15 @@ def print_hi(name):
     # Use a breakpoint in the code line below to debug your script.
     print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
     # modulePath = "Wikipedia-popular-modules.xml"
-    filePath = "appletrainboxtemplates.xml"
+    filePath = "appletrainboxtemplates.xml.bz2"
     # load_modules(modulePath)
-    process_dump(filePath)
+    process_dump_internal(filePath)
 
 
 def load_modules(path):
     namespaces = {828}
     print("Beegin module load...\n")
-    list(parser.process(path, page_handler, namespaces))
+    list(wtp.process(path, page_handler, namespaces))
 
 
 # Press the green button in the gutter to run the script.
