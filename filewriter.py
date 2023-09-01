@@ -1,5 +1,6 @@
 def write(content, list):
     list.add(content)
+    return list
 def init() -> list:
     #starts a list with open html template
     htmlList = []

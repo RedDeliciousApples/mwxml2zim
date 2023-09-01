@@ -52,7 +52,7 @@ def handlelist(listNode: WikiNode):
                 handlelist(item)
             content = "<li> " + item.sarg + "</li>"
             filewriter.write(content, list)
-        filewriter.write("</ul>", list)
+        print(filewriter.write("</ul>", list))
 
     #ordered list
     elif (listNode.sarg.__contains__("#")):
@@ -63,6 +63,6 @@ def handlelist(listNode: WikiNode):
                 handlelist(item)
             content = "<li> " + item.sarg + "</li>"
             filewriter.write(content, list)
-        filewriter.write("</ol>", list)
+        print(filewriter.write("</ol>", list))
 
     print("placeholder")
