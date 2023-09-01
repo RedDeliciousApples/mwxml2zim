@@ -41,6 +41,8 @@ def remove_closing_curly_braces(input_string):
 #    return action_function()
 def tohtml(tree):
     for child in tree.children:
+        if (type(child) is str):
+            continue
         if child.kind == NodeKind.LIST:
             htmlHandler.handlelist(child)
 
@@ -56,6 +58,7 @@ def page_handler(page: Page, wtp: Wtp | None = None) -> Any:
     # parse_tree.children returns alist of children, useful for iteration
     wtp.start_page(page.title)
     parse_tree = wtp.parse(page.body)
+    print(parse_tree)
     tohtml(parse_tree)
     # for i in parse_tree.children:
     #    nodeKind = i.kind
