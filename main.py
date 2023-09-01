@@ -42,6 +42,7 @@ def remove_closing_curly_braces(input_string):
 def tohtml(tree):
     for child in tree.children:
         if (type(child) is str):
+            #TODO should write str w/ filewriter instead of continuing
             continue
         if child.kind == NodeKind.LIST:
             htmlHandler.handlelist(child)
