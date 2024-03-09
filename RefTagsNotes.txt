@@ -1,0 +1,89 @@
+===========================================================================
+Notes on <ref> tags in HTML after Parsoid processing
+===========================================================================
+
+Parsoid is the Mediawiki extension which converts wikitext to HTML.
+ It is a monumental project, as it has to handle thousands of templates,
+ wikitext tags, links...
+ 
+This project only focuses on converting simple <ref> tags to HTML.
+This requires a superscript, like [3], which links to the relevant citation location in the page.
+No need to create links in citations for now (eg. ISBN linked to Special:BookSources, website link linked to the actual website...)
+
+From a basic inspect element on https://en.wikipedia.org/wiki/Apple we can see:
+
+* The superscript is 
+	<sup id="cite_ref-3" class="reference">
+			<a href="#cite_note-3">[3]</a>
+		</sup>
+	
+	So a basic internal page link, w/ a "reference" class, maybe for further CSS editing.
+	
+* The acutual citation is a lot more complicated:
+	<!-- First it's a list to take care of numbering, makes sense. This is all in <ol> </ol> by the way. -->
+		<li id="cite_note-25">
+			<!-- This span encloses the "jump up" character, simple enough. Also includes backlines, see below -->
+			<span class="mw-cite-backlink">
+				<b>
+					<a href="#cite_ref-25" aria-label="Jump up" title="Jump up">^</a>
+				</b>
+			</span>
+			<!-- <span class="reference-text"> is NOT simple. It includes the reference text...-->
+			<span class="reference-text">
+				<!-- what the fuck does this do? -->
+				<link rel="mw-deduplicated-inline-style" href="mw-data:TemplateStyles:r1133582631">
+					<!-- Yes, this is a real HTML tag! From https://www.w3schools.com/tags/tag_cite.asp:
+						"The <cite> tag defines the title of a creative work (e.g. a book, a poem, a song, a movie, a painting, a sculpture, etc.).
+
+						Note: A person's name is not the title of a work.
+
+						The text in the <cite> element usually renders in italic." 
+		
+						Looks like we can just pass it directly to HTML.-->
+					<cite id="CITEREFColledge,_SueConolly,_James2016" class="citation book cs1">
+	Colledge, Sue; Conolly, James, eds. (16 June 2016). <i>The Origins and Spread of Domestic Plants in Southwest Asia and Europe</i>. Left Coast Press.
+	
+	<!-- Link for the ISBN, as stated before we do not do this, so need to ignore it and treat as regular text. -->
+						<a href="/wiki/ISBN_(identifier)" class="mw-redirect" title="ISBN (identifier)">ISBN</a>
+	&nbsp;<a href="/wiki/Special:BookSources/9781598749885" title="Special:BookSources/9781598749885">
+							<bdi>9781598749885</bdi>
+						</a>.
+	</cite>
+					<!-- what the FUCK does this do? -->
+					<span title="ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Abook&amp;rft.genre=book&amp;rft.btitle=The+Origins+and+Spread+of+Domestic+Plants+in+Southwest+Asia+and+Europe&amp;rft.pub=Left+Coast+Press&amp;rft.date=2016-06-16&amp;rft.isbn=9781598749885&amp;rfr_id=info%3Asid%2Fen.wikipedia.org%3AApple" class="Z3988">
+	
+	</span>
+				</span>
+			</li>
+
+
+Backlinks are included like so:
+<span class="mw-cite-backlink">^ <a href="#cite_ref-World_58-0">
+					<span class="cite-accessibility-label">Jump up to: </span>
+					<sup>
+						<i>
+							<b>a</b>
+						</i>
+					</sup>
+				</a>
+				<a href="#cite_ref-World_58-1">
+					<sup>
+						<i>
+							<b>b</b>
+						</i>
+					</sup>
+				</a>
+			</span>
+	
+We will need to give each individual superscript a unique id so we can jump to it. MediaWiki does it like this:
+<sup id="cite_ref-World_58-0" class="reference"><a href="#cite_note-World-58">[58]</a></sup>
+
+So in the code, we can just keep track of whether we've seen that citation number before, if we have, add 1 to the id.
+Try Python set(), it only contains unique objects. Like this:
+
+ seen_items = set()
+ seen_items.add(item)
+
+No need for type checks or any of that, thanks Python. And fuck you Java.
+	
+	
