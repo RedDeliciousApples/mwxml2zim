@@ -41,15 +41,20 @@ def remove_closing_curly_braces(input_string):
 #    return action_function()
 def tohtml(tree):
     print("Got parse tree. Starting loop...")
+
     for child in tree.children:
         print("Loop begin")
         if (type(child) is str):
             print("Was str, continuing\n")
             #TODO should write str w/ filewriter instead of continuing
+
             continue
         if child.kind == NodeKind.LIST:
             print("List found, calling handleList...")
             htmlHandler.handlelist(child)
+        elif child.kind == NodeKind.LINK:
+            print("Link found")
+
 
         print("\nThe " + str(child) + "was processed.\n")
 
