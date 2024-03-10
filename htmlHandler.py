@@ -43,6 +43,7 @@ def hline():
 
 def handlelist(listNode: WikiNode):
     level = len(listNode.sarg)
+    print("\n\n\nLIST FOUND!!!!\n\n\n")
     #unordered list
     if (listNode.sarg.__contains__("*")):
         filewriter.write("<ul> ", list)
@@ -52,7 +53,7 @@ def handlelist(listNode: WikiNode):
                 handlelist(item)
             content = "<li> " + item.sarg + "</li>"
             filewriter.write(content, list)
-        print(filewriter.write("</ul>", list))
+        print("\nLIST:\n" + filewriter.write("</ul>", list))
 
     #ordered list
     elif (listNode.sarg.__contains__("#")):
@@ -63,6 +64,6 @@ def handlelist(listNode: WikiNode):
                 handlelist(item)
             content = "<li> " + item.sarg + "</li>"
             filewriter.write(content, list)
-        print(filewriter.write("</ol>", list))
+        print("\n ORDERED LIST:\n" + filewriter.write("</ol>", list))
 
     print("placeholder")

@@ -2,5 +2,7 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/wikitextprocessor" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/wikitextprocessor/src/wikitextprocessor/lua/mediawiki-extensions-Scribunto" vcs="Git" />
   </component>
 </project>

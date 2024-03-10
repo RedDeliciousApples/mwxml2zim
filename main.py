@@ -40,14 +40,18 @@ def remove_closing_curly_braces(input_string):
 #    action_function = switch_dict.get(case, lambda: "Default action")
 #    return action_function()
 def tohtml(tree):
+    print("Got parse tree. Starting loop...")
     for child in tree.children:
+        print("Loop begin")
         if (type(child) is str):
+            print("Was str, continuing\n")
             #TODO should write str w/ filewriter instead of continuing
             continue
         if child.kind == NodeKind.LIST:
+            print("List found, calling handleList...")
             htmlHandler.handlelist(child)
 
-        print(child)
+        print("\nThe " + str(child) + "was processed.\n")
 
 
 def page_handler(page: Page, wtp: Wtp | None = None) -> Any:
@@ -59,7 +63,7 @@ def page_handler(page: Page, wtp: Wtp | None = None) -> Any:
     # parse_tree.children returns alist of children, useful for iteration
     wtp.start_page(page.title)
     parse_tree = wtp.parse(page.body)
-    print(parse_tree)
+    print("Parsed " + page.title + ", sending to tohtml...")
     tohtml(parse_tree)
     # for i in parse_tree.children:
     #    nodeKind = i.kind
