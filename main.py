@@ -42,21 +42,45 @@ def remove_closing_curly_braces(input_string):
 def tohtml(tree):
     print("Got parse tree. Starting loop...")
 
-    for child in tree.children:
-        print("Loop begin")
-        if (type(child) is str):
+    for i in tree:
+        for child in i.children:
+
+            print(str(child))
+            #print("Loop begin")
+            if (type(child) is str):
+                print("Was str, continuing\n")
+                #TODO should write str w/ filewriter instead of continuing
+
+                continue
+            if child.kind == NodeKind.LIST:
+                print("A list was found")
+                break
+            if child.kind == NodeKind.LIST:
+                print("List found, calling handleList...")
+                htmlHandler.handlelist(child)
+            elif child.kind == NodeKind.LINK:
+                return
+                #print("Link found")
+
+
+        #print("\nThe " + str(child) + "was processed.\n")
+
+#depth first search
+
+def dfs(root):
+    if not root:
+        return
+    print("dfs started")
+    stack = [root]
+    while stack:
+        current_node=stack.pop()
+        print(current_node)
+        if (type(current_node) is str):
             print("Was str, continuing\n")
-            #TODO should write str w/ filewriter instead of continuing
-
             continue
-        if child.kind == NodeKind.LIST:
-            print("List found, calling handleList...")
-            htmlHandler.handlelist(child)
-        elif child.kind == NodeKind.LINK:
-            print("Link found")
+        for child in reversed(current_node.children):
+            stack.append(child)
 
-
-        print("\nThe " + str(child) + "was processed.\n")
 
 
 def page_handler(page: Page, wtp: Wtp | None = None) -> Any:
@@ -69,7 +93,9 @@ def page_handler(page: Page, wtp: Wtp | None = None) -> Any:
     wtp.start_page(page.title)
     parse_tree = wtp.parse(page.body)
     print("Parsed " + page.title + ", sending to tohtml...")
-    tohtml(parse_tree)
+    print(parse_tree)
+    dfs(parse_tree)
+    #tohtml(parse_tree)
     # for i in parse_tree.children:
     #    nodeKind = i.kind
     # ??? python has no swicth stements ???
