@@ -68,16 +68,32 @@ def tohtml(tree):
 #depth first search
 
 def dfs(root):
-    if not root:
+    if not (root.kind == NodeKind.ROOT):
+        print("not at root")
         return
+    else:
+        print("at root")
     print("dfs started")
     stack = [root]
     while stack:
-        current_node=stack.pop()
-        print(current_node)
+        current_node = stack.pop()
+        #print("Currently at node: " + str(current_node))
         if (type(current_node) is str):
             print("Was str, continuing\n")
             continue
+        if (current_node.kind == NodeKind.ROOT):
+            print("At root node!")
+
+
+        if current_node.kind == NodeKind.LIST:
+            print("A list was found")
+            break
+        if current_node.kind == NodeKind.LIST:
+            print("List found, calling handleList...")
+            #htmlHandler.handlelist(child)
+        elif current_node.kind == NodeKind.LINK:
+            return
+
         for child in reversed(current_node.children):
             stack.append(child)
 
@@ -93,7 +109,7 @@ def page_handler(page: Page, wtp: Wtp | None = None) -> Any:
     wtp.start_page(page.title)
     parse_tree = wtp.parse(page.body)
     print("Parsed " + page.title + ", sending to tohtml...")
-    print(parse_tree)
+    #TODO need to only pass root node
     dfs(parse_tree)
     #tohtml(parse_tree)
     # for i in parse_tree.children:
