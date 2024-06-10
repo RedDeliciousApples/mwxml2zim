@@ -11,28 +11,6 @@ import htmlHandler
 wtp = Wtp()
 
 
-def removeTemplate(input_string: str) -> str:
-    #Thanks chatgpt for the regex magic
-    #Nevermind, it doesn't work.
-    # Define a regular expression pattern to match text between curly braces
-    pattern = r'\{[^}]*\}'
-
-    # Use re.sub() to replace the matched pattern with an empty string
-    result = re.sub(pattern, '', input_string)
-
-    return result
-
-
-def remove_closing_curly_braces(input_string):
-    # Define a regular expression pattern to match closing curly braces
-    pattern = r'\}'
-
-    # Use re.sub() to replace the matched pattern with an empty string
-    result = re.sub(pattern, '', input_string)
-
-    return result
-
-
 # switch_dict = {
 #    NodeKind.LEVEL2: html.level2(),
 #    NodeKind.LEVEL3: action_for_case2,
