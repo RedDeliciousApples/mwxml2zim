@@ -102,6 +102,7 @@ def traverse(node, depth=0):
     print(f'Type of node: {type(node)}')
 
     if not isinstance(node, WikiNode):
+        #TODO Apparently, the parse tree can contain strings. Need to account for that
         print(f"Error: Expected WikiNode, got {type(node)}")
         return
 
