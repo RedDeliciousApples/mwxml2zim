@@ -12,6 +12,7 @@ wtp = Wtp()
 
 
 def removeTemplate(input_string: str) -> str:
+    #Thanks chatgpt for the regex magic
     # Define a regular expression pattern to match text between curly braces
     pattern = r'\{[^}]*\}'
 
@@ -126,7 +127,6 @@ def page_handler(page: Page, wtp: Wtp | None = None) -> Any:
     #print("\n\n\n text:\n\n\n" + wtp.expand(page.body))
     traverse(parse_tree, 0)
     print("Parsed " + page.title + ", sending to tohtml...")
-    #TODO need to only pass root node
     dfs(parse_tree)
     #tohtml(parse_tree)
     # for i in parse_tree.children:
@@ -138,7 +138,6 @@ def page_handler(page: Page, wtp: Wtp | None = None) -> Any:
 
     ftext = removeTemplate(page.body)
     text = remove_closing_curly_braces(ftext)
-    # TODO big improvements needed for node_to_html, maybe use mwparserfromhell?
     # filewriter.write("my_file-{}.html".format(page.title), parsed_page.get("html"))
     # print("page text: " + text)
 
