@@ -68,7 +68,7 @@ def tohtml(tree):
 #depth first search
 
 def dfs(root):
-    if not (root.kind == NodeKind.ROOT):
+    if root.kind != NodeKind.ROOT:
         print("not at root")
         return
     else:
