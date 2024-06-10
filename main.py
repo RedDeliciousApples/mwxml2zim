@@ -97,6 +97,19 @@ def dfs(root):
         for child in reversed(current_node.children):
             stack.append(child)
 
+def traverse(node, depth=0):
+    print(f'Processing node at depth {depth}: {node}')
+    print(f'Type of node: {type(node)}')
+
+    if not isinstance(node, WikiNode):
+        print(f"Error: Expected WikiNode, got {type(node)}")
+        return
+
+    print(f'Node kind: {str(node.kind)}')
+    
+    for child in node.children:
+        traverse(child, depth + 1)
+
 
 
 def page_handler(page: Page, wtp: Wtp | None = None) -> Any:
@@ -108,6 +121,9 @@ def page_handler(page: Page, wtp: Wtp | None = None) -> Any:
     # parse_tree.children returns alist of children, useful for iteration
     wtp.start_page(page.title)
     parse_tree = wtp.parse(page.body)
+    print("Calling on type: " + str(type(parse_tree)))
+    #print("\n\n\n text:\n\n\n" + wtp.expand(page.body))
+    traverse(parse_tree, 0)
     print("Parsed " + page.title + ", sending to tohtml...")
     #TODO need to only pass root node
     dfs(parse_tree)
