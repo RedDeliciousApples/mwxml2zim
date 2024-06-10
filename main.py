@@ -13,6 +13,7 @@ wtp = Wtp()
 
 def removeTemplate(input_string: str) -> str:
     #Thanks chatgpt for the regex magic
+    #Nevermind, it doesn't work.
     # Define a regular expression pattern to match text between curly braces
     pattern = r'\{[^}]*\}'
 
