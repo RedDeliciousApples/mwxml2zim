@@ -89,7 +89,8 @@ def traverse(node, depth=0):
             stats["str"] += 1
         else:
             stats["non_str"] += 1
-        print(f"Error: Expected WikiNode, got {type(node)}")
+        print(f"\033[31mError: Expected WikiNode, got {type(node)}\033[0m")
+
     return
 
     print(f'Node kind: {str(node.kind)}')
