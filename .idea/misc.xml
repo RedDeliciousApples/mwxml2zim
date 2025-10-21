@@ -3,5 +3,5 @@
   <component name="Black">
     <option name="sdkName" value="Python 3.10 (mwxml2zim)" />
   </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.10 (mwxml2zim)" project-jdk-type="Python SDK" />
+  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.13 (mwxml2zim)" project-jdk-type="Python SDK" />
 </project>

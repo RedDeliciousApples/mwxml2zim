@@ -77,14 +77,20 @@ def dfs(root):
         for child in reversed(current_node.children):
             stack.append(child)
 
+stats = {"str": 0, "non_str": 0}
+
 def traverse(node, depth=0):
     print(f'Processing node at depth {depth}: {node}')
     print(f'Type of node: {type(node)}')
 
     if not isinstance(node, WikiNode):
         #TODO Apparently, the parse tree can contain strings. Need to account for that
+        if isinstance(node, str):
+            stats["str"] += 1
+        else:
+            stats["non_str"] += 1
         print(f"Error: Expected WikiNode, got {type(node)}")
-        return
+    return
 
     print(f'Node kind: {str(node.kind)}')
     
@@ -114,9 +120,9 @@ def page_handler(page: Page, wtp: Wtp | None = None) -> Any:
     # print(parse_tree.children[24])
     # for e in parse_tree.children:
     #    print(e)
-
-    ftext = removeTemplate(page.body)
-    text = remove_closing_curly_braces(ftext)
+    #TODO implement
+        #ftext = removeTemplate(page.body)
+        #text = remove_closing_curly_braces(ftext)
     # filewriter.write("my_file-{}.html".format(page.title), parsed_page.get("html"))
     # print("page text: " + text)
 
@@ -134,6 +140,7 @@ def process_dump_internal(path):
     # print("\n\nhtml:\n\n" + parser.node_to_html(e))
 
     print("dump finish")
+    print(f"String nodes: {stats['str']}, Non-string nodes: {stats['non_str']}")
 
 
 def print_hi(name):
@@ -149,6 +156,7 @@ def load_modules(path):
     namespaces = {828}
     print("Beegin module load...\n")
     list(wtp.process(path, page_handler, namespaces))
+
 
 
 # Press the green button in the gutter to run the script.
