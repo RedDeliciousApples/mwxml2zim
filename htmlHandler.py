@@ -17,7 +17,8 @@ def _require_init():
 def _write(content: str):
     _require_init()
     filewriter.write(content, _hlist)
-
+def end():
+    filewriter.write(_hlist, "finalfile.html")
 def level2(text: str):
     _write(f"<h2>{text}</h2><br />")
 
