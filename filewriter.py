@@ -8,12 +8,13 @@ def init() -> list:
         <html>
         <head>
             <title>Blank HTML Template</title>
+            <body>
         """)
     return htmlList
 
 def writeClose(list, path):
     list.append("""</head>
-        <body>""")
+        </body>""")
     for i in list:
         try:
             with open(path, 'w') as file:
