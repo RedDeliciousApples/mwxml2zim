@@ -9,7 +9,7 @@ import htmlHandler
 # Press Shift+F10 to execute it or replace it with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 wtp = Wtp()
-htmlHandler.begin()
+thelist = htmlHandler.begin()
 
 # switch_dict = {
 #    NodeKind.LEVEL2: html.level2(),
@@ -28,23 +28,22 @@ DISPATCH = {
 def tohtml(tree):
     print("Got parse tree. Starting loop...")
 
-    for i in tree:
-        for child in i.children:
 
-            print(str(child))
-            #print("Loop begin")
-            if (type(child) is str):
-                print("Was str, continuing\n")
-                #cast to str just in case
-                htmlHandler._write(str(child))
+    for child in tree.children:
 
-                continue
-            handler = DISPATCH.get(child.kind)
-            if handler:
-                handler(child)
-                continue
+        print(str(child))
+        #print("Loop begin")
+        if (type(child) is str):
+            print("Was str, writing...\n")
+            #cast to str just in case
+            htmlHandler._write(str(child))
 
-htmlHandler.end()
+            continue
+        handler = DISPATCH.get(child.kind)
+        if handler:
+            handler(child)
+            continue
+
         #print("\nThe " + str(child) + "was processed.\n")
 
 #depth first search
@@ -122,7 +121,7 @@ def page_handler(page: Page, wtp: Wtp | None = None) -> Any:
     traverse(parse_tree, 0)
     print("Parsed " + page.title + ", sending to tohtml...")
     dfs(parse_tree)
-    #tohtml(parse_tree)
+    tohtml(parse_tree)
     # for i in parse_tree.children:
     #    nodeKind = i.kind
     # ??? python has no swicth stements ???
@@ -150,6 +149,7 @@ def process_dump_internal(path):
 
     print("dump finish")
     print(f"String nodes: {stats['str']}, Non-string nodes: {stats['non_str']}")
+    htmlHandler.end()
 
 
 def print_hi(name):
