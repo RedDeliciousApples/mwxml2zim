@@ -7,13 +7,13 @@ def init() -> list:
         <!DOCTYPE html>
         <html>
         <head>
-            <title>Blank HTML Template</title>
+            <title>Blank HTML Template</title></head>
             <body>
         """)
     return htmlList
 
 def writeClose(writelist, path):
-    writelist.append("""</head>
+    writelist.append("""
         </body>""")
     try:
         with open(path, "w", encoding="utf-8") as f:
