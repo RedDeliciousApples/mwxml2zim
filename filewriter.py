@@ -1,4 +1,4 @@
-def write(content, list) -> None:
+def write(list, content) -> None:
     list.append(content)
 def init() -> list:
     #starts a list with open html template
