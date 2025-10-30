@@ -98,6 +98,7 @@ def traverse(node, depth=0):
 
 
 
+
     print(f'Node kind: {str(node.kind)}')
     
     for child in node.children:
