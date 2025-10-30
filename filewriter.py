@@ -21,7 +21,7 @@ def writeClose(list, path):
                 file.write(i)
             print("File written successfully.")
         except Exception as e:
-            print(f"An error occurred: {e}")
+            print(f"An error occurred and the file could not be written: {e}")
     file.close()
 
 
