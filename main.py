@@ -9,7 +9,7 @@ import htmlHandler
 # Press Shift+F10 to execute it or replace it with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 wtp = Wtp()
-
+htmlHandler.begin()
 
 # switch_dict = {
 #    NodeKind.LEVEL2: html.level2(),
