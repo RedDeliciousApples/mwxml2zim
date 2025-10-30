@@ -84,15 +84,19 @@ def traverse(node, depth=0):
     print(f'Processing node at depth {depth}: {node}')
     print(f'Type of node: {type(node)}')
 
-    if not isinstance(node, WikiNode):
-        #TODO Apparently, the parse tree can contain strings. Need to account for that
-        if isinstance(node, str):
-            stats["str"] += 1
-        else:
-            stats["non_str"] += 1
-        print(f"\033[31mError: Expected WikiNode, got {type(node)}\033[0m")
 
-    return
+    #TODO Apparently, the parse tree can contain strings. Need to account for that
+    if isinstance(node, str):
+        stats["str"] += 1
+    else:
+        stats["non_str"] += 1
+
+
+    if not isinstance(node, WikiNode):
+        print(f"\033[31mError: Expected WikiNode, got {type(node)}\033[0m")
+        return
+
+
 
     print(f'Node kind: {str(node.kind)}')
     
