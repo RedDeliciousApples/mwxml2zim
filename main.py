@@ -72,6 +72,7 @@ def dfs(root):
             print("List found, calling handleList...")
             #htmlHandler.handlelist(child)
         elif current_node.kind == NodeKind.LINK:
+            print("found link from the legend of zelda")
             return
 
         for child in reversed(current_node.children):
