@@ -44,7 +44,7 @@ def tohtml(tree):
                 handler(child)
                 continue
 
-
+htmlHandler.end()
         #print("\nThe " + str(child) + "was processed.\n")
 
 #depth first search
