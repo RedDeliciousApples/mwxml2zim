@@ -67,10 +67,10 @@ def dfs(root):
 
         if current_node.kind == NodeKind.LIST:
             print("A list was found")
-            break
-        if current_node.kind == NodeKind.LIST:
             print("List found, calling handleList...")
             #htmlHandler.handlelist(child)
+            break
+
         elif current_node.kind == NodeKind.LINK:
             print("found link from the legend of zelda")
             return
