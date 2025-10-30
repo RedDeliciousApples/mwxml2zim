@@ -29,7 +29,8 @@ def tohtml(tree):
             #print("Loop begin")
             if (type(child) is str):
                 print("Was str, continuing\n")
-                #TODO should write str w/ filewriter instead of continuing
+                #cast to str just in case
+                htmlHandler._write(str(child))
 
                 continue
             if child.kind == NodeKind.LIST:
