@@ -15,13 +15,11 @@ def init() -> list:
 def writeClose(list, path):
     list.append("""</head>
         </body>""")
-    for i in list:
-        try:
-            with open(path, 'w') as file:
-                file.write(i)
-            print("File written successfully.")
-        except Exception as e:
-            print(f"An error occurred and the file could not be written: {e}")
-    file.close()
+    try:
+        with open(path, "w", encoding="utf-8") as f:
+            f.write("\n".join(list))
+        print(f"File written successfully: {path}")
+    except OSError as e:
+        print(f"An error occurred and the file could not be written: {e}")
 
 
