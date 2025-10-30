@@ -19,6 +19,12 @@ htmlHandler.begin()
 # def switch_case(case):
 #    action_function = switch_dict.get(case, lambda: "Default action")
 #    return action_function()
+DISPATCH = {
+    NodeKind.LIST: htmlHandler.handlelist,
+    NodeKind.LEVEL2: lambda n: htmlHandler.level2(n.sarg),
+    NodeKind.LEVEL3: lambda n: htmlHandler.level3(n.sarg),
+    NodeKind.LEVEL4: lambda n: htmlHandler.level4(n.sarg),
+}
 def tohtml(tree):
     print("Got parse tree. Starting loop...")
 
@@ -33,15 +39,10 @@ def tohtml(tree):
                 htmlHandler._write(str(child))
 
                 continue
-            if child.kind == NodeKind.LIST:
-                print("A list was found")
-                break
-            if child.kind == NodeKind.LIST:
-                print("List found, calling handleList...")
-                htmlHandler.handlelist(child)
-            elif child.kind == NodeKind.LINK:
-                return
-                #print("Link found")
+            handler = DISPATCH.get(child.kind)
+            if handler:
+                handler(child)
+                continue
 
 
         #print("\nThe " + str(child) + "was processed.\n")
