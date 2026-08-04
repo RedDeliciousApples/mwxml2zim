@@ -43,21 +43,32 @@ def bold(text: str):
 def hline():
     _write("<hr>")
 
-def handlelist(listNode: WikiNode):
+def handlelist(list_node: WikiNode):
     _require_init()
-    # unordered list
-    if "*" in listNode.sarg:
-        _write("<ul>")
-        for item in listNode.children:
-            if item.kind == NodeKind.LIST_ITEM:
-                handlelist(item)  # if nested
-            _write(f"<li>{item.sarg}</li>")
-        _write("</ul>")
-    # ordered list
-    elif "#" in listNode.sarg:
-        _write("<ol>")
-        for item in listNode.children:
-            if item.kind == NodeKind.LIST_ITEM:
-                handlelist(item)
-            _write(f"<li>{item.sarg}</li>")
-        _write("</ol>")
+
+    if list_node.sarg.endswith("*"):
+        tag = "ul"
+    else:
+        tag = "ol"
+
+    _write(f"<{tag}>")
+
+    for item in list_node.children:
+        if isinstance(item, str):
+            _write(item)
+            continue
+
+        if item.kind != NodeKind.LIST_ITEM:
+            continue
+
+        _write("<li>")
+
+        for child in item.children:
+            if isinstance(child, str):
+                _write(child)
+            elif child.kind == NodeKind.LIST:
+                handlelist(child)
+
+        _write("</li>")
+
+    _write(f"</{tag}>")
