@@ -40,6 +40,10 @@ def italic(text: str):
 def bold(text: str):
     _write(f"<b>{text}</b>")
 
+def link(text: str):
+    #plain text for now
+    _write(f"{text}")
+
 def hline():
     _write("<hr>")
 

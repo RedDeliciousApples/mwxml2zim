@@ -21,6 +21,7 @@ thelist = htmlHandler.begin()
 #    return action_function()
 DISPATCH = {
     NodeKind.LIST: htmlHandler.handlelist,
+    NodeKind.LINK: lambda node: htmlHandler.link(link_text(node)),
     NodeKind.LEVEL2: lambda node: htmlHandler.level2(heading_text(node)),
     NodeKind.LEVEL3: lambda node: htmlHandler.level3(heading_text(node)),
     NodeKind.LEVEL4: lambda node: htmlHandler.level4(heading_text(node)),
@@ -32,9 +33,22 @@ HEADING_KINDS = {
     NodeKind.LEVEL4,
 }
 
+#eventually this should be moved to its own file
+
 def heading_text(node):
     return "".join(
         part for part in node.largs[0]
+        if isinstance(part, str)
+    )
+
+def link_text(node):
+    if len(node.largs) > 1:
+        parts = node.largs[1]
+    else:
+        parts = node.largs[0]
+
+    return "".join(
+        part for part in parts
         if isinstance(part, str)
     )
 
