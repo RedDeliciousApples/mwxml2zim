@@ -21,10 +21,16 @@ thelist = htmlHandler.begin()
 #    return action_function()
 DISPATCH = {
     NodeKind.LIST: htmlHandler.handlelist,
-    NodeKind.LEVEL2: lambda n: htmlHandler.level2(n.sarg),
-    NodeKind.LEVEL3: lambda n: htmlHandler.level3(n.sarg),
-    NodeKind.LEVEL4: lambda n: htmlHandler.level4(n.sarg),
+    NodeKind.LEVEL2: lambda node: htmlHandler.level2(heading_text(node)),
+    NodeKind.LEVEL3: lambda node: htmlHandler.level3(heading_text(node)),
+    NodeKind.LEVEL4: lambda node: htmlHandler.level4(heading_text(node)),
 }
+def heading_text(node):
+    return "".join(
+        part for part in node.largs[0]
+        if isinstance(part, str)
+    )
+
 def tohtml(tree):
     print("Got parse tree. Starting loop...")
 
