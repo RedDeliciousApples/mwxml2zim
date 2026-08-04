@@ -20,6 +20,8 @@ thelist = htmlHandler.begin()
 #    action_function = switch_dict.get(case, lambda: "Default action")
 #    return action_function()
 DISPATCH = {
+    NodeKind.BOLD: lambda node: htmlHandler.bold(inline_text(node.children)),
+    NodeKind.ITALIC: lambda node: htmlHandler.italic(inline_text(node.children)),
     NodeKind.LIST: htmlHandler.handlelist,
     NodeKind.LINK: lambda node: htmlHandler.link(link_text(node)),
     NodeKind.LEVEL2: lambda node: htmlHandler.level2(heading_text(node)),
@@ -47,10 +49,20 @@ def link_text(node):
     else:
         parts = node.largs[0]
 
-    return "".join(
-        part for part in parts
-        if isinstance(part, str)
-    )
+    return inline_text(parts)
+
+def inline_text(parts):
+    result = []
+
+    for part in parts:
+        if isinstance(part, str):
+            result.append(part)
+        elif part.kind == NodeKind.LINK:
+            result.append(link_text(part))
+        elif part.kind in {NodeKind.BOLD, NodeKind.ITALIC}:
+            result.append(inline_text(part.children))
+
+    return "".join(result)
 
 def tohtml(tree):
     print("Got parse tree. Starting loop...")
