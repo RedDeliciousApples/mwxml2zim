@@ -25,6 +25,13 @@ DISPATCH = {
     NodeKind.LEVEL3: lambda node: htmlHandler.level3(heading_text(node)),
     NodeKind.LEVEL4: lambda node: htmlHandler.level4(heading_text(node)),
 }
+
+HEADING_KINDS = {
+    NodeKind.LEVEL2,
+    NodeKind.LEVEL3,
+    NodeKind.LEVEL4,
+}
+
 def heading_text(node):
     return "".join(
         part for part in node.largs[0]
@@ -46,8 +53,13 @@ def tohtml(tree):
 
             continue
         handler = DISPATCH.get(child.kind)
+
         if handler:
             handler(child)
+
+            if child.kind in HEADING_KINDS:
+                tohtml(child)
+
             continue
 
         #print("\nThe " + str(child) + "was processed.\n")
