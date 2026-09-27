@@ -2,7 +2,6 @@ import argparse
 from functools import partial
 import logging
 import sys
-from typing import Any
 
 # Parse trees regularly contain characters (e.g. ², ₂) that the Windows
 # console encoding (cp1252) cannot encode; make stdout/stderr UTF-8 so
@@ -11,79 +10,18 @@ for _stream in (sys.stdout, sys.stderr):
     if _stream is not None and hasattr(_stream, "reconfigure"):
         _stream.reconfigure(encoding="utf-8", errors="replace")
 
-from wikitextprocessor import Wtp, WikiNode, NodeKind, Page
+from wikitextprocessor import Wtp, WikiNode, Page
 from wikitextprocessor.dumpparser import process_dump
-import re
+from pathlib import Path
+import filewriter
 import htmlHandler
 
 logger = logging.getLogger(__name__)
 
 DEFAULT_DUMP = "appletrainboxtemplates.xml.bz2"
+DEFAULT_OUTPUT_DIR = "out"
 
 wtp = Wtp()
-thelist = htmlHandler.begin()
-
-# switch_dict = {
-#    NodeKind.LEVEL2: html.level2(),
-#    NodeKind.LEVEL3: action_for_case2,
-#    NodeKind.LEVEL4: action_for_case3,
-# }
-# def switch_case(case):
-#    action_function = switch_dict.get(case, lambda: "Default action")
-#    return action_function()
-DISPATCH = {
-    NodeKind.LIST: htmlHandler.handlelist,
-    NodeKind.LEVEL2: lambda n: htmlHandler.level2(n.sarg),
-    NodeKind.LEVEL3: lambda n: htmlHandler.level3(n.sarg),
-    NodeKind.LEVEL4: lambda n: htmlHandler.level4(n.sarg),
-}
-def tohtml(tree):
-    logger.debug("Got parse tree. Starting loop...")
-
-    for child in tree.children:
-        logger.debug("%s", child)
-        if (type(child) is str):
-            logger.debug("Was str, writing...")
-            #cast to str just in case
-            htmlHandler._write(str(child))
-
-            continue
-        handler = DISPATCH.get(child.kind)
-        if handler:
-            handler(child)
-            continue
-
-#depth first search
-
-def dfs(root):
-    if root.kind != NodeKind.ROOT:
-        logger.debug("not at root")
-        return
-    else:
-        logger.debug("at root")
-    logger.debug("dfs started")
-    stack = [root]
-    while stack:
-        current_node = stack.pop()
-        if (type(current_node) is str):
-            logger.debug("Was str, continuing")
-            continue
-        if (current_node.kind == NodeKind.ROOT):
-            logger.debug("At root node!")
-
-
-        if current_node.kind == NodeKind.LIST:
-            logger.debug("A list was found")
-            logger.debug("List found, calling handleList...")
-            #htmlHandler.handlelist(child)
-            break
-
-        elif current_node.kind == NodeKind.LINK:
-            logger.debug("found link from the legend of zelda")
-            return
-
-        for child in reversed(current_node.children):
-            stack.append(child)
 
 stats = {"str": 0, "non_str": 0}
 
@@ -113,46 +51,49 @@ def traverse(node, depth=0):
 
 
 
-def page_handler(page: Page, wtp: Wtp | None = None) -> Any:
+def page_handler(page: Page, wtp: Wtp | None = None,
+                 output_dir: str = DEFAULT_OUTPUT_DIR) -> Path | None:
+    """Parse one page, render it, and write it to its own HTML file.
+
+    Returns the path that was written, or None for skipped/failed pages."""
     if page.model != "wikitext" or page.title.startswith("Template:"):
         logger.debug("%s ignored", page.title)
-        return ["fail on page " + page.title]
-    #    tree = parser.parse(page.text, pre_expand=True)
+        return None
+    if not page.body:
+        logger.debug("%s has no body, skipping", page.title)
+        return None
+
     logger.info("Processing page: %s", page.title)
-    # parse_tree.children returns alist of children, useful for iteration
     wtp.start_page(page.title)
-    parse_tree = wtp.parse(page.body)
-    logger.debug("Calling on type: %s", type(parse_tree))
+    # pre_expand grows the templates that change the page's structure
+    # (tables, lists, infoboxes) before parsing, so they survive as nodes
+    # instead of being left as raw {{...}} text.
+    parse_tree = wtp.parse(page.body, pre_expand=True)
     traverse(parse_tree, 0)
-    logger.debug("Parsed %s, sending to tohtml...", page.title)
-    dfs(parse_tree)
-    tohtml(parse_tree)
-    # for i in parse_tree.children:
-    #    nodeKind = i.kind
-    # ??? python has no swicth stements ???
-    # print(parse_tree.children[24])
-    # for e in parse_tree.children:
-    #    print(e)
-    #TODO implement
-        #ftext = removeTemplate(page.body)
-        #text = remove_closing_curly_braces(ftext)
-    # filewriter.write("my_file-{}.html".format(page.title), parsed_page.get("html"))
-    # print("page text: " + text)
+
+    document = htmlHandler.render_page(page.title, parse_tree, wtp)
+    # A failed write is logged (with its traceback) by filewriter.write_page
+    return filewriter.write_page(output_dir, page.title, document)
 
 
-def process_dump_internal(path):
+def process_dump_internal(path: str, output_dir: str) -> None:
     logger.info("Reading dump: %s", path)
     namespaces = {0, 10}
     process_dump(wtp, path, namespaces)
-    for _ in map(
-            partial(page_handler, wtp=wtp), wtp.get_all_pages([0], False)
+
+    written = 0
+    for result in map(
+            partial(page_handler, wtp=wtp, output_dir=output_dir),
+            wtp.get_all_pages([0], False)
     ):
-        pass
+        if result is not None:
+            written += 1
     # we need all pages in Module: namespace, figuring out how to get these...
 
     logger.info("Dump finished")
+    logger.info("Wrote %s page(s) to %s", written, output_dir)
     logger.info("String nodes: %s, Non-string nodes: %s", stats["str"], stats["non_str"])
-    htmlHandler.end()
+
 
 
 def load_modules(path):
@@ -198,6 +139,10 @@ def main() -> None:
         help="path to a <project>-<date>-pages-articles.xml.bz2 dump (default: %(default)s)",
     )
     parser.add_argument(
+        "-o", "--output-dir", default=DEFAULT_OUTPUT_DIR, metavar="DIR",
+        help="directory for one HTML file per page (default: %(default)s)",
+    )
+    parser.add_argument(
         "-v", "--verbose", action="store_true",
         help="log per-node parse-tree detail to the console",
     )
@@ -208,7 +153,7 @@ def main() -> None:
     args = parser.parse_args()
 
     _configure_logging(args.verbose, args.log_file)
-    process_dump_internal(args.dump)
+    process_dump_internal(args.dump, args.output_dir)
 
 
 if __name__ == '__main__':

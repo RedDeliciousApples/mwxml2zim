@@ -3,3 +3,4 @@ wikitextprocessor
 __pycache__/
 *.py[cod]
 finalfile.html
+out/
