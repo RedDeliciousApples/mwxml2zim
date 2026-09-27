@@ -1,4 +1,6 @@
+import argparse
 from functools import partial
+import logging
 import sys
 from typing import Any
 
@@ -14,8 +16,10 @@ from wikitextprocessor.dumpparser import process_dump
 import re
 import htmlHandler
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+logger = logging.getLogger(__name__)
+
+DEFAULT_DUMP = "appletrainboxtemplates.xml.bz2"
+
 wtp = Wtp()
 thelist = htmlHandler.begin()
 
@@ -34,15 +38,12 @@ DISPATCH = {
     NodeKind.LEVEL4: lambda n: htmlHandler.level4(n.sarg),
 }
 def tohtml(tree):
-    print("Got parse tree. Starting loop...")
-
+    logger.debug("Got parse tree. Starting loop...")
 
     for child in tree.children:
-
-        print(str(child))
-        #print("Loop begin")
+        logger.debug("%s", child)
         if (type(child) is str):
-            print("Was str, writing...\n")
+            logger.debug("Was str, writing...")
             #cast to str just in case
             htmlHandler._write(str(child))
 
@@ -52,36 +53,33 @@ def tohtml(tree):
             handler(child)
             continue
 
-        #print("\nThe " + str(child) + "was processed.\n")
-
 #depth first search
 
 def dfs(root):
     if root.kind != NodeKind.ROOT:
-        print("not at root")
+        logger.debug("not at root")
         return
     else:
-        print("at root")
-    print("dfs started")
+        logger.debug("at root")
+    logger.debug("dfs started")
     stack = [root]
     while stack:
         current_node = stack.pop()
-        #print("Currently at node: " + str(current_node))
         if (type(current_node) is str):
-            print("Was str, continuing\n")
+            logger.debug("Was str, continuing")
             continue
         if (current_node.kind == NodeKind.ROOT):
-            print("At root node!")
+            logger.debug("At root node!")
 
 
         if current_node.kind == NodeKind.LIST:
-            print("A list was found")
-            print("List found, calling handleList...")
+            logger.debug("A list was found")
+            logger.debug("List found, calling handleList...")
             #htmlHandler.handlelist(child)
             break
 
         elif current_node.kind == NodeKind.LINK:
-            print("found link from the legend of zelda")
+            logger.debug("found link from the legend of zelda")
             return
 
         for child in reversed(current_node.children):
@@ -90,26 +88,26 @@ def dfs(root):
 stats = {"str": 0, "non_str": 0}
 
 def traverse(node, depth=0):
-    print(f'Processing node at depth {depth}: {node}')
-    print(f'Type of node: {type(node)}')
+    logger.debug("Processing node at depth %s: %s", depth, node)
+    logger.debug("Type of node: %s", type(node))
 
 
-    #TODO Apparently, the parse tree can contain strings. Need to account for that
+    # Strings are normal in parse trees (plain wikitext text), not an error
     if isinstance(node, str):
         stats["str"] += 1
-    else:
-        stats["non_str"] += 1
+        return
+    stats["non_str"] += 1
 
 
     if not isinstance(node, WikiNode):
-        print(f"\033[31mError: Expected WikiNode, got {type(node)}\033[0m")
+        logger.error("Expected WikiNode, got %s", type(node))
         return
 
 
 
 
-    print(f'Node kind: {str(node.kind)}')
-    
+    logger.debug("Node kind: %s", node.kind)
+
     for child in node.children:
         traverse(child, depth + 1)
 
@@ -117,17 +115,16 @@ def traverse(node, depth=0):
 
 def page_handler(page: Page, wtp: Wtp | None = None) -> Any:
     if page.model != "wikitext" or page.title.startswith("Template:"):
-        print(page.title + " ignored")
+        logger.debug("%s ignored", page.title)
         return ["fail on page " + page.title]
     #    tree = parser.parse(page.text, pre_expand=True)
-    print("breakpoint page processed: " + page.title)
+    logger.info("Processing page: %s", page.title)
     # parse_tree.children returns alist of children, useful for iteration
     wtp.start_page(page.title)
     parse_tree = wtp.parse(page.body)
-    print("Calling on type: " + str(type(parse_tree)))
-    #print("\n\n\n text:\n\n\n" + wtp.expand(page.body))
+    logger.debug("Calling on type: %s", type(parse_tree))
     traverse(parse_tree, 0)
-    print("Parsed " + page.title + ", sending to tohtml...")
+    logger.debug("Parsed %s, sending to tohtml...", page.title)
     dfs(parse_tree)
     tohtml(parse_tree)
     # for i in parse_tree.children:
@@ -144,6 +141,7 @@ def page_handler(page: Page, wtp: Wtp | None = None) -> Any:
 
 
 def process_dump_internal(path):
+    logger.info("Reading dump: %s", path)
     namespaces = {0, 10}
     process_dump(wtp, path, namespaces)
     for _ in map(
@@ -151,33 +149,68 @@ def process_dump_internal(path):
     ):
         pass
     # we need all pages in Module: namespace, figuring out how to get these...
-    # for e in search_tree:
-    # print("iterated: " + str(len(e)))
-    # print("\n\nhtml:\n\n" + parser.node_to_html(e))
 
-    print("dump finish")
-    print(f"String nodes: {stats['str']}, Non-string nodes: {stats['non_str']}")
+    logger.info("Dump finished")
+    logger.info("String nodes: %s, Non-string nodes: %s", stats["str"], stats["non_str"])
     htmlHandler.end()
-
-
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
-    # modulePath = "Wikipedia-popular-modules.xml"
-    filePath = "appletrainboxtemplates.xml.bz2"
-    # load_modules(modulePath)
-    process_dump_internal(filePath)
 
 
 def load_modules(path):
     namespaces = {828}
-    print("Beegin module load...\n")
+    logger.info("Beginning module load...")
     list(wtp.process(path, page_handler, namespaces))
 
 
+def _configure_logging(verbose: bool = False, log_file: str | None = None) -> None:
+    """Console shows INFO progress only; -v/--verbose adds the per-node
+    DEBUG detail. --log-file always captures DEBUG so the spam stays
+    available without flooding the terminal.
 
-# Press the green button in the gutter to run the script.
+    Root is set to DEBUG and each handler filters its own level --
+    basicConfig(level=..., handlers=...) would ignore the level."""
+    console = logging.StreamHandler()
+    console.setLevel(logging.DEBUG if verbose else logging.INFO)
+    console.setFormatter(logging.Formatter("%(levelname)-7s %(name)s: %(message)s"))
+
+    handlers: list[logging.Handler] = [console]
+    if log_file:
+        file_handler = logging.FileHandler(log_file, mode="a", encoding="utf-8")
+        file_handler.setLevel(logging.DEBUG)
+        file_handler.setFormatter(
+            logging.Formatter("%(asctime)s %(levelname)-7s %(name)s: %(message)s")
+        )
+        handlers.append(file_handler)
+
+    root = logging.getLogger()
+    for handler in list(root.handlers):
+        root.removeHandler(handler)
+    root.setLevel(logging.DEBUG)
+    for handler in handlers:
+        root.addHandler(handler)
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(
+        description="Convert a MediaWiki XML dump to HTML (ZIM output not implemented yet)."
+    )
+    parser.add_argument(
+        "dump", nargs="?", default=DEFAULT_DUMP,
+        help="path to a <project>-<date>-pages-articles.xml.bz2 dump (default: %(default)s)",
+    )
+    parser.add_argument(
+        "-v", "--verbose", action="store_true",
+        help="log per-node parse-tree detail to the console",
+    )
+    parser.add_argument(
+        "--log-file", metavar="PATH",
+        help="also write DEBUG-level logs to PATH",
+    )
+    args = parser.parse_args()
+
+    _configure_logging(args.verbose, args.log_file)
+    process_dump_internal(args.dump)
+
+
 if __name__ == '__main__':
-    print_hi('PyCharm')
+    main()
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/

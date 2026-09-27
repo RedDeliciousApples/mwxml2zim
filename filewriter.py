@@ -1,3 +1,8 @@
+import logging
+
+logger = logging.getLogger(__name__)
+
+
 def write(content,list) -> None:
     list.append(content)
 def init() -> list:
@@ -18,8 +23,9 @@ def writeClose(writelist, path):
     try:
         with open(path, "w", encoding="utf-8") as f:
             f.write("\n".join(writelist))
-        print(f"File written successfully: {path}")
-    except OSError as e:
-        print(f"An error occurred and the file could not be written: {e}")
+    except OSError:
+        logger.exception("An error occurred and the file could not be written: %s", path)
+    else:
+        logger.info("File written successfully: %s", path)
 
 

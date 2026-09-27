@@ -1,2 +1,5 @@
 venv
 wikitextprocessor
+__pycache__/
+*.py[cod]
+finalfile.html
