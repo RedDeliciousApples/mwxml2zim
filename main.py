@@ -95,13 +95,6 @@ def process_dump_internal(path: str, output_dir: str) -> None:
     logger.info("String nodes: %s, Non-string nodes: %s", stats["str"], stats["non_str"])
 
 
-
-def load_modules(path):
-    namespaces = {828}
-    logger.info("Beginning module load...")
-    list(wtp.process(path, page_handler, namespaces))
-
-
 def _configure_logging(verbose: bool = False, log_file: str | None = None) -> None:
     """Console shows INFO progress only; -v/--verbose adds the per-node
     DEBUG detail. --log-file always captures DEBUG so the spam stays
