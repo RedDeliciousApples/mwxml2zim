@@ -1,5 +1,13 @@
 from functools import partial
+import sys
 from typing import Any
+
+# Parse trees regularly contain characters (e.g. ², ₂) that the Windows
+# console encoding (cp1252) cannot encode; make stdout/stderr UTF-8 so
+# debug printing does not crash mid-dump.
+for _stream in (sys.stdout, sys.stderr):
+    if _stream is not None and hasattr(_stream, "reconfigure"):
+        _stream.reconfigure(encoding="utf-8", errors="replace")
 
 from wikitextprocessor import Wtp, WikiNode, NodeKind, Page
 from wikitextprocessor.dumpparser import process_dump
