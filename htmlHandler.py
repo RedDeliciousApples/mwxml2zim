@@ -51,24 +51,22 @@ HEADING_TAGS = {
 VOID_HTML_TAGS = {"br", "hr"}
 
 # Container tags whose wikitext content is a list of files or source code;
-# without the files themselves there is nothing worth showing
+# without the files themselves there is nothing to show
 DROPPED_HTML_TAGS = {"gallery", "imagemap", "timeline"}
 
-# [[File:...]] arguments that only place the image, not caption text
+# [[File:...]] arguments that place the image
 MEDIA_LAYOUT_ARGS = {
     "thumb", "thumbnail", "frame", "frameless", "right", "left", "center",
     "none", "upright",
 }
 
-# [[File:...]] arguments that are technical settings rather than anything a
-# reader should see ("alt=...", "width=...")
+# [[File:...]] arguments that are technical settings
 MEDIA_TECHNICAL_ARGS = {
     "alt", "link", "page", "class", "style", "width", "height", "border",
     "thumbnailtime", "thumbtime",
 }
 
-# Anything that does not look like a normal HTML attribute name (an
-# attribute name is what could carry event handlers) is not passed through
+# Anything that does not look like a normal HTML attribute name is not passed through
 ATTRIBUTE_NAME = re.compile(r"[A-Za-z][A-Za-z0-9_-]*")
 
 
@@ -103,9 +101,7 @@ def _list_tag(prefix: str) -> str:
 
 
 def _is_media_argument(text: str) -> bool:
-    """True for a [[File:...]] argument that is not caption text: the ones
-    that only place the image (thumb, left, 200px) and the technical ones
-    (alt=..., link=..., width=...)."""
+    """True for a [[File:...]] argument that is not caption text, like image placement"""
     if text.endswith("px"):  # "200px", "640x480px"
         return True
     if "=" in text:
@@ -165,34 +161,22 @@ class Renderer:
 
         Template and link arguments are handed to us as raw wikitext
         (''italics'', <small>, <ref>, * lists, nested {{templates}}), so it
-        is parsed here first: that turns the markup into real nodes instead
-        of letting it show up as escaped literal text.
+        is parsed here first.
         """
         if self.wtp is None:
             self._write(html.escape(text))
             return
 
-        # MediaWiki trims template arguments before it uses them; without
-        # this, a value like " Apple" (the space in "| name = Apple") would
-        # come back as a spurious <pre> block.
         text = text.strip()
         if not text:
             return
 
-        # A single-line fragment that starts with "*", "#", ";" or ":" would
-        # be parsed as a list simply because it starts a line here, while in
-        # the article it is usually mid-sentence (a reconstruction such as
-        # "*aplaz" in {{lang|gem-x-proto|*aplaz}}).  Keep that literal.
-        # Multi-line fragments keep their lists: there the markers really
-        # are at the start of a line.
+        # A fragment starting "*", "#", ";" or ":" might not always be a lsit
         if "\n" not in text and text[:1] in "*#;:":
             self._write(html.escape(text))
             return
 
-        # wikitextprocessor prints its parse warnings straight to stdout and
-        # has no flag to turn that off.  Capture them while parsing a
-        # fragment (a fragment is a poor context for them anyway) and keep
-        # them as DEBUG lines instead.
+        # Send parse warnings to debug log level
         captured = io.StringIO()
         with contextlib.redirect_stdout(captured):
             tree = self.wtp.parse(text)
@@ -222,9 +206,7 @@ class Renderer:
     def _attributes(self, attrs: dict) -> str:
         """Turn a node's HTML attributes into ' class="wikitable" ...'.
 
-        Values are quoted and escaped so they cannot break out of the tag,
-        and attribute names that do not look like plain HTML attribute names
-        are dropped rather than passed through."""
+        If a value doesn't look like plain HTML, it's dropped."""
         written = ""
         for name, value in attrs.items():
             if not ATTRIBUTE_NAME.fullmatch(str(name)):
@@ -236,10 +218,7 @@ class Renderer:
     # ------------------------------------------------------------- headings
 
     def _heading(self, node: WikiNode) -> None:
-        # The section title lives in node.largs.  node.sarg only holds the
-        # "=" marker (and is empty for headings), which is why reading sarg
-        # used to produce empty <h2></h2> tags.  The section's content is
-        # in the node's children and follows the heading.
+        # the section title is in node.largs
         tag = HEADING_TAGS[node.kind]
         self._write(f"<{tag}>")
         self._render(node.largs)
@@ -278,8 +257,6 @@ class Renderer:
         self._write(f"</{tag}>")
 
         if node.definition:
-            # A ";" definition-list item keeps its definition in a separate
-            # field instead of in its children; it becomes the <dd>.
             self._write("<dd>")
             self._render(node.definition)
             self._write("</dd>")
@@ -289,10 +266,7 @@ class Renderer:
     def _link(self, node: WikiNode) -> None:
         """[[Target|Text]] and friends.
 
-        Links are deliberately plain text for now: how articles will be
-        addressed inside the ZIM file gets decided later, so for the moment
-        only the words survive.  Category links vanish completely (their
-        markup is metadata, not prose) while file links keep their caption.
+        Links are plain text for now
         """
         if not node.largs:
             return
@@ -325,9 +299,7 @@ class Renderer:
     def _url(self, node: WikiNode) -> None:
         """[https://example Text] -- also plain text, for the same reason.
 
-        Deliberately not passed through _render_fragment(): the parser turns
-        a bare "https://..." right back into a URL node, so re-parsing a
-        display text that happens to be a URL would recurse forever.
+        Deliberately not passed through _render_fragment() to avoid recursing forever
         """
         if not node.largs:
             return
@@ -354,8 +326,7 @@ class Renderer:
     def _render_argument(self, argument) -> None:
         """Render one template argument.
 
-        Named arguments start with "label="; the label is a parameter name,
-        not prose, so it is dropped ({{cite web|title=Apple}} renders as
+        Example: ({{cite web|title=Apple}} renders as
         "Apple", not "title=Apple")."""
         items = argument if isinstance(argument, list) else [argument]
         if items and isinstance(items[0], str) and "=" in items[0]:
@@ -418,8 +389,7 @@ class Renderer:
             return
 
         if not node.children:
-            # An empty unknown tag left open could swallow the rest of the
-            # page, and it has no content worth showing either.
+            # Empty unknown tag should be removed
             logger.debug("Dropping empty <%s> tag", tag)
             return
 
@@ -428,11 +398,7 @@ class Renderer:
         self._write(f"</{tag}>")
 
 
-# Which function renders which parse node.  Registered after the class so the
-# handlers can be written as ordinary methods; _render_node() calls them as
-# handler(self, node).  ROOT is not listed because render_document() walks
-# its children directly, and a node kind without a handler (if a future
-# library version adds one) falls back to rendering its children.
+# Which function renders which parse node
 HANDLERS = {
     NodeKind.LEVEL1: Renderer._heading,
     NodeKind.LEVEL2: Renderer._heading,
