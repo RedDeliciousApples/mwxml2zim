@@ -1,5 +1,4 @@
 import argparse
-from functools import partial
 import logging
 import sys
 
@@ -81,17 +80,20 @@ def process_dump_internal(path: str, output_dir: str) -> None:
     namespaces = {0, 10}
     process_dump(wtp, path, namespaces)
 
-    written = 0
-    for result in map(
-            partial(page_handler, wtp=wtp, output_dir=output_dir),
-            wtp.get_all_pages([0], False)
-    ):
-        if result is not None:
-            written += 1
+    written: list[str] = []
+    for page in wtp.get_all_pages([0], False):
+        if page_handler(page, wtp=wtp, output_dir=output_dir) is not None:
+            written.append(page.title)
     # we need all pages in Module: namespace, figuring out how to get these...
 
+    # index.html is the entry point into the output directory
+    index = htmlHandler.render_index(
+        [(title, filewriter.page_filename(title)) for title in written]
+    )
+    filewriter.write_page(output_dir, "index", index)
+
     logger.info("Dump finished")
-    logger.info("Wrote %s page(s) to %s", written, output_dir)
+    logger.info("Wrote %s page(s) + index to %s", len(written), output_dir)
     logger.info("String nodes: %s, Non-string nodes: %s", stats["str"], stats["non_str"])
 
 
@@ -125,7 +127,8 @@ def _configure_logging(verbose: bool = False, log_file: str | None = None) -> No
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Convert a MediaWiki XML dump to HTML (ZIM output not implemented yet)."
+        description="Render a MediaWiki XML dump as static HTML "
+                    "(one file per page, plus an index; proof of concept)."
     )
     parser.add_argument(
         "dump", nargs="?", default=DEFAULT_DUMP,

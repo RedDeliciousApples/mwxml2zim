@@ -80,6 +80,24 @@ def render_page(title: str, tree: WikiNode, wtp=None) -> str:
     return Renderer(title, wtp).render_document(tree)
 
 
+def render_index(entries) -> str:
+    """Render an index document listing every page that was written.
+
+    ``entries`` is a sequence of (title, filename) pairs -- filenames, not
+    titles, because links must match filewriter's sanitised names.
+    """
+    items = "".join(
+        f'<li><a href="{html.escape(filename)}">{html.escape(title)}</a></li>\n'
+        for title, filename in entries
+    )
+    body = (
+        "<h1>Articles</h1>\n"
+        "<p>Rendered from a MediaWiki XML dump — proof of concept.</p>\n"
+        f"<ul>\n{items}</ul>"
+    )
+    return DOCUMENT.format(title="Index", body=body)
+
+
 def _plain_text(value) -> str:
     """Flatten a parse-tree value (string, nested list or WikiNode) to text."""
     if isinstance(value, str):
