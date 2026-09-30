@@ -126,7 +126,7 @@ class Renderer:
         self._render_children(tree)
         return DOCUMENT.format(
             title=html.escape(self.title),
-            body="\n".join(self.parts),
+            body="".join(self.parts),
         )
 
     # ------------------------------------------------------------- plumbing
